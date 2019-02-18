@@ -193,6 +193,10 @@ int Penelope::doSomething(){
     return GWSTATUS_CONTINUE_GAME;
 }
 
+void Penelope::damage(){
+    setDead();
+}
+
 Exit::Exit(double xc, double yc, StudentWorld* w):Actor(IID_EXIT, xc, yc, 0, 1, w){}
 
 bool Exit::blockFlame(){
@@ -210,4 +214,15 @@ int Exit::doSomething(){
     return hell()->exitDo(this);
 }
 
-// Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
+Prop::Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w)
+: Actor(imageID, xc, yc, ddir, 0, w){}
+
+Pit::Pit(double xc, double yc, StudentWorld* w)
+: Prop(IID_PIT, xc, yc, 0, w){}
+
+int Pit::doSomething(){
+    hell()->burn(this);
+    
+    
+    return GWSTATUS_CONTINUE_GAME;
+}

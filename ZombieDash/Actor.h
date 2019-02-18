@@ -17,6 +17,8 @@ public:
     virtual bool blockFlame();
     bool isAlive();
     void setDead();
+    virtual void damage(){}
+    virtual void infect(){}
     StudentWorld* hell();
 private:
     bool alive;
@@ -45,6 +47,7 @@ public:
     bool isInfected();
     bool getWorse();
     int getInfectionCount();
+    bool blockMove(){return true;}
 private:
     bool infected;
     int infectionCount;
@@ -63,6 +66,7 @@ public:
     int getNumFlames();
     int getNumVaccines();
     int doSomething();
+    void damage();
 private:
     int numLandmines;
     int numFlames;
@@ -73,6 +77,19 @@ class Exit : public Actor{
 public:
     Exit(double xc, double yc, StudentWorld* w);
     bool blockFlame();
+    int doSomething();
+};
+
+//-------------------------------------------------------------------------------------------
+
+class Prop : public Actor{
+public:
+    Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w);
+};
+
+class Pit : public Prop{
+public:
+    Pit(double xc, double yc, StudentWorld* w);
     int doSomething();
 };
 

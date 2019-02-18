@@ -20,14 +20,15 @@ public:
     virtual int move();
     virtual void cleanUp();
     bool canMoveTo(double dest_x, double dest_y);
-    //list<Actor*>::iterator remove(list<Actor*>::iterator pp);
     //list<Actor*>::iterator overlapCitizen(Actor* e);
     int exitDo(Exit* e);
-    bool overlap(Actor* a1, Actor* a2);
+    void burn(Actor* a);
 private:
     list<Actor*> l;
-    Penelope* p;
+    Penelope* penelope;
     int numOfCitizens;
+    list<Actor*>::iterator remove(list<Actor*>::iterator pp);
+    bool overlap(Actor* a1, Actor* a2);
 };
 
 #endif // STUDENTWORLD_H_
