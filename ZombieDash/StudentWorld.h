@@ -23,6 +23,7 @@ public:
     //list<Actor*>::iterator overlapCitizen(Actor* e);
     int exitDo(Exit* e);
     void burn(Actor* a);
+    void poison(Actor* a);
 private:
     list<Actor*> l;
     Penelope* penelope;

@@ -22,12 +22,20 @@ StudentWorld::StudentWorld(string assetPath)
 {
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Three Must Implement Functions
+
 int StudentWorld::init()
 {
     Level lev(assetPath());
     ostringstream oss;
     oss<<"level";
-    int k = getLevel();
+    //--------------------------------
+    //********************************
+    int k = getLevel()+1; //Remember to Change It Back!!
+    //********************************
+    //--------------------------------
     if(k<10)
         oss<<'0'<<k;
     else
@@ -68,20 +76,34 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
-    // This code is here merely to allow the game to build, run, and terminate after you hit enter.
-    // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
-    if(penelope->doSomething()==GWSTATUS_PLAYER_DIED)
+    if(penelope->doSomething()==GWSTATUS_PLAYER_DIED){
+        playSound(SOUND_PLAYER_DIE);
         return GWSTATUS_PLAYER_DIED;
+    }
     list<Actor*>::iterator it = l.begin();
     Actor* current;
     int status;
     for(;it!=l.end();it++){
         current = *it;
         status = current->doSomething();
-        if(status==GWSTATUS_FINISHED_LEVEL)
+        if(status==GWSTATUS_FINISHED_LEVEL){
+            playSound(SOUND_LEVEL_FINISHED);
             return GWSTATUS_FINISHED_LEVEL;
-        if(status==GWSTATUS_PLAYER_DIED)
+        }
+        if(status==GWSTATUS_PLAYER_DIED){
+            playSound(SOUND_PLAYER_DIE);
             return GWSTATUS_PLAYER_DIED;
+        }
+    }
+    
+    list<Actor*>::iterator p = l.begin();
+    while(p!=l.end()){
+        current = *p;
+        if(!current->isAlive()){
+            p=remove(p);
+            continue;
+        }
+        p++;
     }
     
     return GWSTATUS_CONTINUE_GAME;
@@ -100,7 +122,7 @@ void StudentWorld::cleanUp()
     penelope=nullptr;
 }
 
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
 
 //Some commonly used functions
 
@@ -155,7 +177,7 @@ bool StudentWorld::overlap(Actor* a1, Actor* a2){
     return false;
 }
 
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
 
 //Some actions related to doSomething() that can only be done here
 
@@ -173,9 +195,9 @@ int StudentWorld::exitDo(Exit* e){
             numOfCitizens--;
             delete current;
             pp=l.erase(pp);
+            playSound(SOUND_CITIZEN_SAVED);
         }
     }
-    
     if(overlap(e,penelope)){
         if(numOfCitizens==0){
             return GWSTATUS_FINISHED_LEVEL;
@@ -198,6 +220,27 @@ void StudentWorld::burn(Actor* a){
         }
         if(overlap(a,current)){
             current->damage();
+            p++;
+            continue;
+        }
+        p++;
+    }
+}
+
+void StudentWorld::poison(Actor* a){
+    if(overlap(penelope,a))
+        penelope->infect();
+    
+    list<Actor*>::iterator p = l.begin();
+    Actor* current;
+    while(p!=l.end()){
+        current = *p;
+        if(!current->canBeInfected()){
+            p++;
+            continue;
+        }
+        if(overlap(a,current)){
+            current->infect();
             p++;
             continue;
         }

@@ -2,6 +2,10 @@
 #include "StudentWorld.h"
 #include <list>
 
+//-----------------------------------------------------------------------------------------
+
+//Actor
+
 Actor::Actor(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w)
 : GraphObject(imageID, xc, yc, ddir, ddepth), alive(true), m_hell(w){}
 
@@ -33,6 +37,10 @@ StudentWorld* Actor::hell(){
     return m_hell;
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Wall and Exit: Two Special Blocks Directly Derived From Actor
+
 Wall::Wall(int xc, int yc, StudentWorld* w) : Actor(IID_WALL, xc, yc, 0, 0, w){}
 
 bool Wall::blockMove(){
@@ -45,6 +53,27 @@ bool Wall::blockFlame(){
 
 int Wall::doSomething(){return GWSTATUS_CONTINUE_GAME;}
 
+Exit::Exit(double xc, double yc, StudentWorld* w):Actor(IID_EXIT, xc, yc, 0, 1, w){}
+
+bool Exit::blockFlame(){
+    return true;
+}
+
+/*
+ void Exit::doSomething(){
+ list<Actor*>::iterator pp = hell()->overlapCitizen(this);
+ hell()->remove(pp);
+ }
+ */
+
+int Exit::doSomething(){
+    return hell()->exitDo(this);
+}
+
+//-----------------------------------------------------------------------------------------
+
+//First Level Virtual Classes Derived From Actor
+
 CanBeDamaged::CanBeDamaged(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w)
 : Actor(imageID, xc, yc, ddir, ddepth, w){}
 
@@ -52,8 +81,16 @@ bool CanBeDamaged::canBeDamaged(){
     return true;
 }
 
-CanBeInfected::CanBeInfected(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w)
-: CanBeDamaged(imageID, xc, yc, ddir, ddepth, w){
+
+Prop::Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w)
+: Actor(imageID, xc, yc, ddir, 0, w){}
+
+//-----------------------------------------------------------------------------------------
+
+//Second Level Virtual Classes
+
+CanBeInfected::CanBeInfected(int imageID, double xc, double yc, StudentWorld* w)
+: CanBeDamaged(imageID, xc, yc, 0, 0, w){
     infected = false;
     infectionCount = 0;
 }
@@ -82,8 +119,55 @@ bool CanBeInfected::canBeInfected(){
     return true;
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Prop Classes
+
+Pit::Pit(double xc, double yc, StudentWorld* w)
+: Prop(IID_PIT, xc, yc, 0, w){}
+
+int Pit::doSomething(){
+    hell()->burn(this);
+    
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+Flame::Flame(double xc, double yc, int ddir, StudentWorld* w)
+: Prop(IID_FLAME, xc, yc, ddir, w), ttl(2){}
+
+int Flame::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(ttl==0){
+        setDead();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    hell()->burn(this);
+    ttl--;
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+Vomit::Vomit(double xc, double yc, int ddir, StudentWorld* w)
+: Prop(IID_VOMIT, xc, yc, ddir, w), ttl(2){}
+
+int Vomit::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(ttl==0){
+        setDead();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    hell()->poison(this);
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+//-----------------------------------------------------------------------------------------
+
+//Goodie Classes
+
+//-----------------------------------------------------------------------------------------
 Penelope::Penelope(double xc, double yc, StudentWorld* w)
-: CanBeInfected(IID_PLAYER, xc, yc, 0, 0, w){
+: CanBeInfected(IID_PLAYER, xc, yc, w){
     numLandmines = 0;
     numFlames = 0;
     numVaccines = 0;
@@ -197,32 +281,3 @@ void Penelope::damage(){
     setDead();
 }
 
-Exit::Exit(double xc, double yc, StudentWorld* w):Actor(IID_EXIT, xc, yc, 0, 1, w){}
-
-bool Exit::blockFlame(){
-    return true;
-}
-
-/*
-void Exit::doSomething(){
-    list<Actor*>::iterator pp = hell()->overlapCitizen(this);
-    hell()->remove(pp);
-}
- */
-
-int Exit::doSomething(){
-    return hell()->exitDo(this);
-}
-
-Prop::Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w)
-: Actor(imageID, xc, yc, ddir, 0, w){}
-
-Pit::Pit(double xc, double yc, StudentWorld* w)
-: Prop(IID_PIT, xc, yc, 0, w){}
-
-int Pit::doSomething(){
-    hell()->burn(this);
-    
-    
-    return GWSTATUS_CONTINUE_GAME;
-}

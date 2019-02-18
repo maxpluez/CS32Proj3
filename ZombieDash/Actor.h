@@ -5,7 +5,9 @@
 
 class StudentWorld;
 
-// Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
+//-----------------------------------------------------------------------------------------
+
+//Actor class
 
 class Actor : public GraphObject{
 public:
@@ -25,6 +27,10 @@ private:
     StudentWorld* m_hell;
 };
 
+//-----------------------------------------------------------------------------------------
+
+//Two Special Objects Directly Derived From Actor
+
 class Wall : public Actor{
 public:
     Wall(int xc, int yc, StudentWorld* w);
@@ -33,15 +39,35 @@ public:
     bool blockFlame();
 };
 
+class Exit : public Actor{
+public:
+    Exit(double xc, double yc, StudentWorld* w);
+    bool blockFlame();
+    int doSomething();
+};
+
+//-----------------------------------------------------------------------------------------
+
+//First Level Virtual Classes Derived From Actor
+
 class CanBeDamaged : public Actor{
 public:
     CanBeDamaged(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w);
     bool canBeDamaged();
 };
 
+class Prop : public Actor{
+public:
+    Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w);
+};
+
+//-----------------------------------------------------------------------------------------
+
+//Second Level Virtual Classes
+
 class CanBeInfected : public CanBeDamaged{
 public:
-    CanBeInfected(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w);
+    CanBeInfected(int imageID, double xc, double yc, StudentWorld* w);
     bool canBeInfected();
     void infect();
     bool isInfected();
@@ -52,6 +78,38 @@ private:
     bool infected;
     int infectionCount;
 };
+
+//-----------------------------------------------------------------------------------------
+
+//Prop Classes
+
+class Pit : public Prop{
+public:
+    Pit(double xc, double yc, StudentWorld* w);
+    int doSomething();
+};
+
+class Flame : public Prop{
+public:
+    Flame(double xc, double yc, int ddir, StudentWorld* w);
+    int doSomething();
+private:
+    int ttl;
+};
+
+class Vomit : public Prop{
+public:
+    Vomit(double xc, double yc, int ddir, StudentWorld* w);
+    int doSomething();
+private:
+    int ttl;
+};
+
+//-----------------------------------------------------------------------------------------
+
+//Goodie Classes
+
+//-----------------------------------------------------------------------------------------
 
 class Penelope : public CanBeInfected{
 public:
@@ -73,24 +131,6 @@ private:
     int numVaccines;
 };
 
-class Exit : public Actor{
-public:
-    Exit(double xc, double yc, StudentWorld* w);
-    bool blockFlame();
-    int doSomething();
-};
-
-//-------------------------------------------------------------------------------------------
-
-class Prop : public Actor{
-public:
-    Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w);
-};
-
-class Pit : public Prop{
-public:
-    Pit(double xc, double yc, StudentWorld* w);
-    int doSomething();
-};
+//-----------------------------------------------------------------------------------------
 
 #endif // ACTOR_H_
