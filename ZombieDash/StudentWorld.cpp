@@ -78,6 +78,7 @@ int StudentWorld::move()
 {
     if(penelope->doSomething()==GWSTATUS_PLAYER_DIED){
         playSound(SOUND_PLAYER_DIE);
+        decLives();
         return GWSTATUS_PLAYER_DIED;
     }
     list<Actor*>::iterator it = l.begin();
@@ -92,6 +93,7 @@ int StudentWorld::move()
         }
         if(status==GWSTATUS_PLAYER_DIED){
             playSound(SOUND_PLAYER_DIE);
+            decLives();
             return GWSTATUS_PLAYER_DIED;
         }
     }

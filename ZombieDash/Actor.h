@@ -65,9 +65,9 @@ public:
 
 //Second Level Virtual Classes
 
-class CanBeInfected : public CanBeDamaged{
+class GoodPeople : public CanBeDamaged{
 public:
-    CanBeInfected(int imageID, double xc, double yc, StudentWorld* w);
+    GoodPeople(int imageID, double xc, double yc, StudentWorld* w);
     bool canBeInfected();
     void infect();
     bool isInfected();
@@ -111,7 +111,7 @@ private:
 
 //-----------------------------------------------------------------------------------------
 
-class Penelope : public CanBeInfected{
+class Penelope : public GoodPeople{
 public:
     Penelope(double xc, double yc, StudentWorld* w);
     void incLandmines();

@@ -89,21 +89,21 @@ Prop::Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w)
 
 //Second Level Virtual Classes
 
-CanBeInfected::CanBeInfected(int imageID, double xc, double yc, StudentWorld* w)
+GoodPeople::GoodPeople(int imageID, double xc, double yc, StudentWorld* w)
 : CanBeDamaged(imageID, xc, yc, 0, 0, w){
     infected = false;
     infectionCount = 0;
 }
 
-void CanBeInfected::infect(){
+void GoodPeople::infect(){
     infected = true;
 }
 
-bool CanBeInfected::isInfected(){
+bool GoodPeople::isInfected(){
     return infected;
 }
 
-bool CanBeInfected::getWorse(){
+bool GoodPeople::getWorse(){
     if(infected){
         infectionCount++;
         return true;
@@ -111,11 +111,11 @@ bool CanBeInfected::getWorse(){
     return false;
 }
 
-int CanBeInfected::getInfectionCount(){
+int GoodPeople::getInfectionCount(){
     return infectionCount;
 }
 
-bool CanBeInfected::canBeInfected(){
+bool GoodPeople::canBeInfected(){
     return true;
 }
 
@@ -167,7 +167,7 @@ int Vomit::doSomething(){
 
 //-----------------------------------------------------------------------------------------
 Penelope::Penelope(double xc, double yc, StudentWorld* w)
-: CanBeInfected(IID_PLAYER, xc, yc, w){
+: GoodPeople(IID_PLAYER, xc, yc, w){
     numLandmines = 0;
     numFlames = 0;
     numVaccines = 0;
