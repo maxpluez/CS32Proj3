@@ -65,7 +65,14 @@ public:
 
 //Second Level Virtual Classes
 
-class GoodPeople : public CanBeDamaged{
+class People : public CanBeDamaged{
+public:
+    People(int imageID, double xc, double yc, StudentWorld* w);
+    void newCoord(double& x, double& y, int direction, double amount);
+    bool blockMove(){return true;}
+};
+
+class GoodPeople : public People{
 public:
     GoodPeople(int imageID, double xc, double yc, StudentWorld* w);
     bool canBeInfected();
@@ -73,10 +80,34 @@ public:
     bool isInfected();
     bool getWorse();
     int getInfectionCount();
-    bool blockMove(){return true;}
 private:
     bool infected;
     int infectionCount;
+};
+
+class Goodie : public CanBeDamaged{
+public:
+    Goodie(int imageID, double xc, double yc, StudentWorld* w);
+};
+
+class BadPeople : public People{
+public:
+    BadPeople(int imageID, double xc, double yc, StudentWorld* w);
+    bool zombieMove();
+    bool planMovement();
+    void setRandomDirection();
+    
+    bool vomit();
+    
+    bool isParalyzed(){return paralyzed;}
+    void changeParalyzeStatus(){paralyzed = !paralyzed;}
+    
+    int getMovementPlan(){return movementPlan;}
+    //bool decMovementPlan();
+    //void setPlanToZero(){movementPlan=0;}
+private:
+    bool paralyzed;
+    int movementPlan;
 };
 
 //-----------------------------------------------------------------------------------------
@@ -109,7 +140,27 @@ private:
 
 //Goodie Classes
 
+class VaccineGoodie : public Goodie{
+public:
+    VaccineGoodie(double xc, double yc, StudentWorld* w);
+    int doSomething();
+};
+
+class GasCanGoodie : public Goodie{
+public:
+    GasCanGoodie(double xc, double yc, StudentWorld* w);
+    int doSomething();
+};
+
+class LandmineGoodie : public Goodie{
+public:
+    LandmineGoodie(double xc, double yc, StudentWorld* w);
+    int doSomething();
+};
+
 //-----------------------------------------------------------------------------------------
+
+//Good Peoples
 
 class Penelope : public GoodPeople{
 public:
@@ -117,9 +168,9 @@ public:
     void incLandmines();
     void incFlames();
     void incVaccines();
-    bool decLandmines();
-    bool decFlames();
-    bool decVaccines();
+    bool useLandmine();
+    bool useFlame();
+    bool useVaccine();
     int getNumLandmines();
     int getNumFlames();
     int getNumVaccines();
@@ -132,5 +183,19 @@ private:
 };
 
 //-----------------------------------------------------------------------------------------
+
+//Bad Peoples
+
+class DumbZombie : public BadPeople{
+public:
+    DumbZombie(double xc, double yc, StudentWorld* w);
+    int doSomething();
+};
+
+class SmartZombie : public BadPeople{
+public:
+    SmartZombie(double xc, double yc, StudentWorld* w);
+    int doSomething();
+};
 
 #endif // ACTOR_H_

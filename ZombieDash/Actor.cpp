@@ -89,8 +89,22 @@ Prop::Prop(int imageID, double xc, double yc, int ddir, StudentWorld* w)
 
 //Second Level Virtual Classes
 
+People::People(int imageID, double xc, double yc, StudentWorld* w)
+: CanBeDamaged(imageID, xc, yc, 0, 0, w){}
+
+void People::newCoord(double& x, double& y, int direction, double amount){
+    if(direction==left)
+        x-=amount;
+    if(direction==right)
+        x+=amount;
+    if(direction==up)
+        y+=amount;
+    if(direction==down)
+        y-=amount;
+}
+
 GoodPeople::GoodPeople(int imageID, double xc, double yc, StudentWorld* w)
-: CanBeDamaged(imageID, xc, yc, 0, 0, w){
+: People(imageID, xc, yc, w){
     infected = false;
     infectionCount = 0;
 }
@@ -118,6 +132,82 @@ int GoodPeople::getInfectionCount(){
 bool GoodPeople::canBeInfected(){
     return true;
 }
+
+Goodie::Goodie(int imageID, double xc, double yc, StudentWorld* w)
+: CanBeDamaged(imageID, xc, yc, 0, 1, w){}
+
+BadPeople::BadPeople(int imageID, double xc, double yc, StudentWorld* w)
+: People(imageID, xc, yc, w), paralyzed(false), movementPlan(0){}
+
+bool BadPeople::planMovement(){
+    if(movementPlan!=0)
+        return false;
+    int n = randInt(3,10);
+    movementPlan = n;
+    return true;
+}
+
+bool BadPeople::zombieMove(){
+    int direction = getDirection();
+    double dest_x = getX();
+    double dest_y = getY();
+    newCoord(dest_x, dest_y, direction, 1);
+    if(hell()->canMoveTo(dest_x, dest_y, this)){
+        moveTo(dest_x,dest_y);
+        movementPlan--;
+        return true;
+    } else {
+        movementPlan=0;
+        return false;
+    }
+}
+
+void BadPeople::setRandomDirection(){
+    int i = randInt(1,4);
+    switch(i){
+        case 1:
+            setDirection(up);
+            break;
+        case 2:
+            setDirection(down);
+            break;
+        case 3:
+            setDirection(left);
+            break;
+        case 4:
+            setDirection(right);
+            break;
+    }
+}
+
+bool BadPeople::vomit(){
+    double vomitX = getX();
+    double vomitY = getY();
+    int direction = getDirection();
+    if(direction==left||direction==right)
+        newCoord(vomitX, vomitY, direction, SPRITE_WIDTH);
+    else
+        newCoord(vomitX, vomitY, direction, SPRITE_HEIGHT);
+    if(hell()->personInFront(vomitX, vomitY)){
+        int n = randInt(1,3);
+        if(n==1){
+            hell()->addVomit(vomitX, vomitY, getDirection());
+            hell()->playSound(SOUND_ZOMBIE_VOMIT);
+            changeParalyzeStatus();
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+bool BadPeople::decMovementPlan(){
+    if(movementPlan<=0)
+        return false;
+    movementPlan--;
+    return true;
+}
+ */
 
 //-----------------------------------------------------------------------------------------
 
@@ -158,6 +248,7 @@ int Vomit::doSomething(){
         return GWSTATUS_CONTINUE_GAME;
     }
     hell()->poison(this);
+    ttl--;
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -165,7 +256,55 @@ int Vomit::doSomething(){
 
 //Goodie Classes
 
+VaccineGoodie::VaccineGoodie(double xc, double yc, StudentWorld* w)
+: Goodie(IID_VACCINE_GOODIE, xc, yc, w){}
+
+int VaccineGoodie::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(hell()->penelopeStepOn(this)){
+        hell()->increaseScore(50);
+        setDead();
+        hell()->playSound(SOUND_GOT_GOODIE);
+        hell()->pGetVaccine();
+    }
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+GasCanGoodie::GasCanGoodie(double xc, double yc, StudentWorld* w)
+: Goodie(IID_GAS_CAN_GOODIE, xc, yc, w){}
+
+int GasCanGoodie::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(hell()->penelopeStepOn(this)){
+        hell()->increaseScore(50);
+        setDead();
+        hell()->playSound(SOUND_GOT_GOODIE);
+        hell()->pGetFlame();
+    }
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+LandmineGoodie::LandmineGoodie(double xc, double yc, StudentWorld* w)
+: Goodie(IID_LANDMINE_GOODIE, xc, yc, w){}
+
+int LandmineGoodie::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(hell()->penelopeStepOn(this)){
+        hell()->increaseScore(50);
+        setDead();
+        hell()->playSound(SOUND_GOT_GOODIE);
+        hell()->pGetLandmine();
+    }
+    return GWSTATUS_CONTINUE_GAME;
+}
+
 //-----------------------------------------------------------------------------------------
+
+//Good Peoples
+
 Penelope::Penelope(double xc, double yc, StudentWorld* w)
 : GoodPeople(IID_PLAYER, xc, yc, w){
     numLandmines = 0;
@@ -174,18 +313,18 @@ Penelope::Penelope(double xc, double yc, StudentWorld* w)
 }
 
 void Penelope::incLandmines(){
-    numLandmines++;
+    numLandmines+=2;
 }
 
 void Penelope::incFlames(){
-    numFlames++;
+    numFlames+=5;
 }
 
 void Penelope::incVaccines(){
     numVaccines++;
 }
 
-bool Penelope::decLandmines(){
+bool Penelope::useLandmine(){
     if(numLandmines>0){
         numLandmines--;
         return true;
@@ -193,7 +332,7 @@ bool Penelope::decLandmines(){
     return false;
 }
 
-bool Penelope::decFlames(){
+bool Penelope::useFlame(){
     if(numFlames>0){
         numFlames--;
         return true;
@@ -201,7 +340,7 @@ bool Penelope::decFlames(){
     return false;
 }
 
-bool Penelope::decVaccines(){
+bool Penelope::useVaccine(){
     if(numVaccines>0){
         numVaccines--;
         return true;
@@ -235,42 +374,31 @@ int Penelope::doSomething(){
     int key;
     if(!hell()->getKey(key))
         return GWSTATUS_CONTINUE_GAME;
-    double dest_x, dest_y;
+    double dest_x = getX();
+    double dest_y = getY();
     switch(key){
         case KEY_PRESS_RIGHT:
             setDirection(right);
-            dest_x = getX() + 4;
-            dest_y = getY();
-            if(dest_x>=VIEW_WIDTH)
-                return GWSTATUS_CONTINUE_GAME;
-            if(hell()->canMoveTo(dest_x, dest_y))
+            newCoord(dest_x, dest_y, right, 4);
+            if(hell()->canMoveTo(dest_x, dest_y, this))
                 moveTo(dest_x, dest_y);
             break;
         case KEY_PRESS_LEFT:
             setDirection(left);
-            dest_x = getX() - 4;
-            dest_y = getY();
-            if(dest_x<=0)
-                return GWSTATUS_CONTINUE_GAME;
-            if(hell()->canMoveTo(dest_x, dest_y))
+            newCoord(dest_x, dest_y, left, 4);
+            if(hell()->canMoveTo(dest_x, dest_y, this))
                 moveTo(dest_x, dest_y);
             break;
         case KEY_PRESS_UP:
             setDirection(up);
-            dest_x = getX();
-            dest_y = getY() + 4;
-            if(dest_y>=VIEW_WIDTH)
-                return GWSTATUS_CONTINUE_GAME;
-            if(hell()->canMoveTo(dest_x, dest_y))
+            newCoord(dest_x, dest_y, up, 4);
+            if(hell()->canMoveTo(dest_x, dest_y, this))
                 moveTo(dest_x, dest_y);
             break;
         case KEY_PRESS_DOWN:
             setDirection(down);
-            dest_x = getX();
-            dest_y = getY() - 4;
-            if(dest_y<=0)
-                return GWSTATUS_CONTINUE_GAME;
-            if(hell()->canMoveTo(dest_x, dest_y))
+            newCoord(dest_x, dest_y, down, 4);
+            if(hell()->canMoveTo(dest_x, dest_y, this))
                 moveTo(dest_x, dest_y);
             break;
     }
@@ -281,3 +409,73 @@ void Penelope::damage(){
     setDead();
 }
 
+//-----------------------------------------------------------------------------------------
+
+DumbZombie::DumbZombie(double xc, double yc, StudentWorld* w)
+: BadPeople(IID_ZOMBIE, xc, yc, w){}
+
+int DumbZombie::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(isParalyzed()){
+        changeParalyzeStatus();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    
+    //Determine vomit
+    if(vomit()){
+        changeParalyzeStatus();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    
+    //Determine move
+    if(getMovementPlan()==0){
+        planMovement();
+        setRandomDirection();
+    }
+    zombieMove();
+    changeParalyzeStatus();
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+SmartZombie::SmartZombie(double xc, double yc, StudentWorld* w)
+: BadPeople(IID_ZOMBIE, xc, yc, w){}
+
+int SmartZombie::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(isParalyzed()){
+        changeParalyzeStatus();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    
+    //Determine vomit
+    if(vomit()){
+        changeParalyzeStatus();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    
+    //Determine move
+    if(getMovementPlan()==0){
+        planMovement();
+    
+        double targetX, targetY;
+    
+        if(hell()->smartScan(this, targetX, targetY)){
+            if(getX()<targetX)
+                setDirection(right);
+            else if(getY()<targetY)
+                setDirection(up);
+            else if(getX()>targetX)
+                setDirection(left);
+            else
+                setDirection(down);
+        } else {
+            setRandomDirection();
+        }
+    }
+    
+    zombieMove();
+    changeParalyzeStatus();
+    return GWSTATUS_CONTINUE_GAME;
+}
