@@ -534,7 +534,7 @@ int Citizen::doSomething(){
             dest_y = getY();
             newCoord(dest_x, dest_y, direction2, 2);
             if(hell()->canMoveTo(dest_x, dest_y, this)){
-                setDirection(direction1);
+                setDirection(direction2);
                 moveTo(dest_x, dest_y);
                 changeParalyzeStatus();
                 return GWSTATUS_CONTINUE_GAME;
