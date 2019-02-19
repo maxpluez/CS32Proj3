@@ -1,6 +1,7 @@
 #include "Actor.h"
 #include "StudentWorld.h"
 #include <list>
+#include <iostream>
 
 //-----------------------------------------------------------------------------------------
 
@@ -433,11 +434,13 @@ int Penelope::getNumVaccines(){
 int Penelope::doSomething(){
     if(!isAlive())
         return GWSTATUS_PLAYER_DIED;
+    
     if(infectToDeath()){
         setDead();
         hell()->playSound(SOUND_PLAYER_DIE);
         return GWSTATUS_PLAYER_DIED;
     }
+    
     int key;
     if(!hell()->getKey(key))
         return GWSTATUS_CONTINUE_GAME;

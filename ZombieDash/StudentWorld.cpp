@@ -81,6 +81,8 @@ int StudentWorld::init()
                         break;
                     case Level::citizen:
                         l.push_back(new Citizen(SPRITE_WIDTH*i, SPRITE_HEIGHT*j, this));
+                        numOfCitizens++;
+                        cout<<"citizen created"<<endl;
                         break;
                     default:
                         //cerr << "I'll handle you later";
@@ -88,6 +90,7 @@ int StudentWorld::init()
                 }
             }
         }
+        cerr<<"created"<<endl;
     }
     
     return GWSTATUS_CONTINUE_GAME;
@@ -116,7 +119,6 @@ int StudentWorld::move()
             return GWSTATUS_PLAYER_DIED;
         }
     }
-    
     list<Actor*>::iterator p = l.begin();
     while(p!=l.end()){
         current = *p;
@@ -242,10 +244,10 @@ int StudentWorld::exitDo(Exit* e){
         if(overlap(e,current)){
             increaseScore(500);
             numOfCitizens--;
-            delete current;
-            pp=l.erase(pp);
+            pp=remove(pp);
             playSound(SOUND_CITIZEN_SAVED);
         }
+        pp++;
     }
     if(overlap(e,penelope)){
         if(numOfCitizens==0){
