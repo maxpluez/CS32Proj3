@@ -79,6 +79,9 @@ int StudentWorld::init()
                     case Level::smart_zombie:
                         l.push_back(new SmartZombie(SPRITE_WIDTH*i, SPRITE_HEIGHT*j, this));
                         break;
+                    case Level::citizen:
+                        l.push_back(new Citizen(SPRITE_WIDTH*i, SPRITE_HEIGHT*j, this));
+                        break;
                     default:
                         //cerr << "I'll handle you later";
                         break;
@@ -215,8 +218,8 @@ bool StudentWorld::overlap(Actor* a1, Actor* a2){
     return false;
 }
 
-void StudentWorld::addVomit(double vomitX, double vomitY, int ddir){
-    l.push_back(new Vomit(vomitX, vomitY, ddir, this));
+void StudentWorld::addActor(Actor* a){
+    l.push_back(a);
 }
 
 double StudentWorld::distance(double x1, double x2, double y1, double y2){
@@ -310,19 +313,26 @@ bool StudentWorld::personInFront(double vomitX, double vomitY){
 bool StudentWorld::smartScan(Actor *self, double& targetX, double& targetY){
     list<Actor*>::iterator min = l.begin();
     Actor* current = *min;
-    while(!current->canBeInfected()&&min!=l.end()){
+    while(min!=l.end()&&!current->canBeInfected()){
         min++;
         current = *min;
     }
-    if(min==l.end())
-        return false;
+    if(min==l.end()){
+        targetX = penelope->getX();
+        targetY = penelope->getY();
+        double d = distance(self->getX(), targetX, self->getY(), targetY);
+        d=sqrt(d);
+        if(d>80)
+            return false;
+        return true;
+    }
     
     double minDistance = distance(self->getX(), current->getX(), self->getY(), current->getY());
     
     list<Actor*>::iterator p = min;
     p++;
     current = *p;
-    while(!current->canBeInfected()&&p!=l.end()){
+    while(p!=l.end()&&!current->canBeInfected()){
         p++;
         current = *p;
     }
@@ -357,6 +367,50 @@ bool StudentWorld::smartScan(Actor *self, double& targetX, double& targetY){
         return false;
     
     return true;
+}
+
+double StudentWorld::distp(Actor* self){
+    return sqrt(distance(penelope->getX(), self->getX(), penelope->getY(), self->getY()));
+}
+
+double StudentWorld::distz(double x, double y){
+    list<Actor*>::iterator min = l.begin();
+    Actor* current = *min;
+    while(min!=l.end()&&!(current->canBeDamaged()&&!current->canBeInfected()&&current->blockMove())){
+        min++;
+        current = *min;
+    }
+    if(min==l.end()){
+        return -1;
+    }
+    
+    double minDistance = distance(x, current->getX(), y, current->getY());
+    
+    list<Actor*>::iterator p = min;
+    p++;
+    current = *p;
+    while(p!=l.end()&&!(current->canBeDamaged()&&!current->canBeInfected()&&current->blockMove())){
+        p++;
+        current = *p;
+    }
+    
+    double delta;
+    
+    for(;p!=l.end();p++){
+        current = *p;
+        if(current->canBeDamaged()&&!current->canBeInfected()&&current->blockMove()){
+            delta = distance(x, current->getX(), y, current->getY());
+            if(delta<minDistance){
+                minDistance = delta;
+            }
+        }
+    }
+    return sqrt(minDistance);
+}
+
+void StudentWorld::penelopeCoord(double& targetX, double& targetY){
+    targetX = penelope->getX();
+    targetY = penelope->getY();
 }
 
 void StudentWorld::pGetVaccine(){

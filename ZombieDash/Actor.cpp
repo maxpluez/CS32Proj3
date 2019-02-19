@@ -103,6 +103,65 @@ void People::newCoord(double& x, double& y, int direction, double amount){
         y-=amount;
 }
 
+int People::approach(double targetX, double targetY, int& another){
+    double selfX = getX();
+    double selfY = getY();
+    if(selfX==targetX){
+        if(selfY>targetY)
+            return down;
+        else
+            return up;
+    }
+    if(selfY==targetY) {
+        if(selfX>targetX)
+            return left;
+        else
+            return right;
+    }
+    int n = randInt(1,2);
+    if(selfX>targetX){
+        if(selfY>targetY){
+            switch(n){
+                case 1:
+                    another = down;
+                    return left;
+                default:
+                    another = left;
+                    return down;
+            }
+        } else {
+            switch(n){
+                case 1:
+                    another = up;
+                    return left;
+                default:
+                    another = left;
+                    return up;
+            }
+        }
+    } else {
+        if(selfY>targetY){
+            switch(n){
+                case 1:
+                    another = down;
+                    return right;
+                default:
+                    another = right;
+                    return down;
+            }
+        } else {
+            switch(n){
+                case 1:
+                    another = up;
+                    return right;
+                default:
+                    another = right;
+                    return up;
+            }
+        }
+    }
+}
+
 GoodPeople::GoodPeople(int imageID, double xc, double yc, StudentWorld* w)
 : People(imageID, xc, yc, w){
     infected = false;
@@ -131,6 +190,16 @@ int GoodPeople::getInfectionCount(){
 
 bool GoodPeople::canBeInfected(){
     return true;
+}
+
+bool GoodPeople::infectToDeath(){
+    if(isInfected()){
+        getWorse();
+        if(getInfectionCount()>=500){
+            return true;
+        }
+    }
+    return false;
 }
 
 Goodie::Goodie(int imageID, double xc, double yc, StudentWorld* w)
@@ -191,7 +260,8 @@ bool BadPeople::vomit(){
     if(hell()->personInFront(vomitX, vomitY)){
         int n = randInt(1,3);
         if(n==1){
-            hell()->addVomit(vomitX, vomitY, getDirection());
+            Vomit* v = new Vomit(vomitX, vomitY, getDirection(), hell());
+            hell()->addActor(v);
             hell()->playSound(SOUND_ZOMBIE_VOMIT);
             changeParalyzeStatus();
             return true;
@@ -363,13 +433,10 @@ int Penelope::getNumVaccines(){
 int Penelope::doSomething(){
     if(!isAlive())
         return GWSTATUS_PLAYER_DIED;
-    if(isInfected()){
-        getWorse();
-        if(getInfectionCount()>=500){
-            setDead();
-            hell()->playSound(SOUND_PLAYER_DIE);
-            return GWSTATUS_PLAYER_DIED;
-        }
+    if(infectToDeath()){
+        setDead();
+        hell()->playSound(SOUND_PLAYER_DIE);
+        return GWSTATUS_PLAYER_DIED;
     }
     int key;
     if(!hell()->getKey(key))
@@ -407,6 +474,120 @@ int Penelope::doSomething(){
 
 void Penelope::damage(){
     setDead();
+}
+
+Citizen::Citizen(double xc, double yc, StudentWorld* w)
+: GoodPeople(IID_CITIZEN, xc, yc, w), paralyzed(false){}
+
+int Citizen::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(infectToDeath()){
+        setDead();
+        hell()->playSound(SOUND_ZOMBIE_BORN);
+        hell()->increaseScore(-1000);
+        int n = randInt(1,10);
+        CanBeDamaged* z;
+        switch(n){
+            case 1:
+            case 2:
+            case 3:
+                z = new VaccineGoodie(getX(), getY(), hell());
+                break;
+            default:
+                z = new DumbZombie(getX(), getY(), hell());
+        }
+        hell()->addActor(z);
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    if(isParalyzed()){
+        changeParalyzeStatus();
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    
+    //Determine movement
+    double dest_x = getX();
+    double dest_y = getY();
+    double dist_p = hell()->distp(this);
+    double dist_z = hell()->distz(dest_x, dest_y);
+    
+    if((dist_p<dist_z||dist_z==-1)&&dist_p<=80){
+        double targetX;
+        double targetY;
+        hell()->penelopeCoord(targetX, targetY);
+        int direction2 = -1;
+        int direction1 = approach(targetX, targetY, direction2);
+        
+        newCoord(dest_x, dest_y, direction1, 2);
+        if(hell()->canMoveTo(dest_x, dest_y, this)){
+            setDirection(direction1);
+            moveTo(dest_x, dest_y);
+            changeParalyzeStatus();
+            return GWSTATUS_CONTINUE_GAME;
+        }
+        
+        if(direction2!=-1){
+            dest_x = getX();
+            dest_y = getY();
+            newCoord(dest_x, dest_y, direction2, 2);
+            if(hell()->canMoveTo(dest_x, dest_y, this)){
+                setDirection(direction1);
+                moveTo(dest_x, dest_y);
+                changeParalyzeStatus();
+                return GWSTATUS_CONTINUE_GAME;
+            }
+        }
+    }
+    
+    if(dist_z<=80){
+        int maxFleeDir = -1;
+        double maxDis = -1;
+        double currentDis = -1;
+        dest_x = getX();
+        dest_y = getY();
+        
+        //check up
+        if(hell()->canMoveTo(dest_x, dest_y+2, this)){
+            currentDis = hell()->distz(dest_x, dest_y+2);
+            if(currentDis>dist_z){
+                maxFleeDir = up;
+                maxDis = currentDis;
+            }
+        }
+        //check down
+        if(hell()->canMoveTo(dest_x, dest_y-2, this)){
+            currentDis = hell()->distz(dest_x, dest_y-2);
+            if(currentDis>dist_z&&currentDis>maxDis){
+                maxFleeDir = down;
+                maxDis = currentDis;
+            }
+        }
+        //check left
+        if(hell()->canMoveTo(dest_x-2, dest_y, this)){
+            currentDis = hell()->distz(dest_x-2, dest_y);
+            if(currentDis>dist_z&&currentDis>maxDis){
+                maxFleeDir = left;
+                maxDis = currentDis;
+            }
+        }
+        //check right
+        if(hell()->canMoveTo(dest_x+2, dest_y, this)){
+            currentDis = hell()->distz(dest_x+2, dest_y);
+            if(currentDis>dist_z&&currentDis>maxDis){
+                maxFleeDir = right;
+                maxDis = currentDis;
+            }
+        }
+        
+        if(maxFleeDir!=-1){
+            setDirection(maxFleeDir);
+            newCoord(dest_x, dest_y, maxFleeDir, 2);
+            moveTo(dest_x, dest_y);
+        }
+    }
+    
+    changeParalyzeStatus();
+    return GWSTATUS_CONTINUE_GAME;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -460,21 +641,14 @@ int SmartZombie::doSomething(){
         planMovement();
     
         double targetX, targetY;
+        int another = -1;
     
         if(hell()->smartScan(this, targetX, targetY)){
-            if(getX()<targetX)
-                setDirection(right);
-            else if(getY()<targetY)
-                setDirection(up);
-            else if(getX()>targetX)
-                setDirection(left);
-            else
-                setDirection(down);
+            setDirection(approach(targetX, targetY, another));
         } else {
             setRandomDirection();
         }
     }
-    
     zombieMove();
     changeParalyzeStatus();
     return GWSTATUS_CONTINUE_GAME;

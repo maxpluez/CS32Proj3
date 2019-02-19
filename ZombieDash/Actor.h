@@ -70,6 +70,7 @@ public:
     People(int imageID, double xc, double yc, StudentWorld* w);
     void newCoord(double& x, double& y, int direction, double amount);
     bool blockMove(){return true;}
+    int approach(double targetX, double targetY, int& another);
 };
 
 class GoodPeople : public People{
@@ -77,12 +78,13 @@ public:
     GoodPeople(int imageID, double xc, double yc, StudentWorld* w);
     bool canBeInfected();
     void infect();
-    bool isInfected();
-    bool getWorse();
-    int getInfectionCount();
+    bool infectToDeath();
 private:
     bool infected;
     int infectionCount;
+    bool isInfected();
+    bool getWorse();
+    int getInfectionCount();
 };
 
 class Goodie : public CanBeDamaged{
@@ -180,6 +182,17 @@ private:
     int numLandmines;
     int numFlames;
     int numVaccines;
+};
+
+class Citizen : public GoodPeople{
+public:
+    Citizen(double xc, double yc, StudentWorld* w);
+    int doSomething();
+    
+    bool isParalyzed(){return paralyzed;}
+    void changeParalyzeStatus(){paralyzed = !paralyzed;}
+private:
+    bool paralyzed;
 };
 
 //-----------------------------------------------------------------------------------------
