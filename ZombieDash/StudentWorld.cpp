@@ -43,8 +43,10 @@ int StudentWorld::init()
     oss<<".txt";
     string levelFile = oss.str();
     Level::LoadResult result = lev.loadLevel(levelFile);
-    if (result == Level::load_fail_file_not_found)
-        cerr << "Cannot find level01.txt data file" << endl;
+    if (result == Level::load_fail_file_not_found){
+        cerr << "Cannot find data file" << endl;
+        return GWSTATUS_PLAYER_WON;
+    }
     else if (result == Level::load_fail_bad_format)
         cerr << "Your level was improperly formatted" << endl;
     else if (result == Level::load_success){
@@ -88,7 +90,6 @@ int StudentWorld::init()
                 }
             }
         }
-        cerr<<"created"<<endl;
     }
     
     return GWSTATUS_CONTINUE_GAME;
@@ -126,6 +127,24 @@ int StudentWorld::move()
         }
         p++;
     }
+    
+    ostringstream oss;
+    oss<<"Score: ";
+    oss<<getScore();
+    oss<<"  Level: ";
+    oss<<getLevel();
+    oss<<"  Lives: ";
+    oss<<getLives();
+    oss<<"  Vacc: ";
+    oss<<penelope->getNumVaccines();
+    oss<<"  Flames: ";
+    oss<<penelope->getNumFlames();
+    oss<<"  Mines: ";
+    oss<<penelope->getNumLandmines();
+    oss<<"  Infected: ";
+    oss<<penelope->getInfectionCount();
+    string s = oss.str();
+    setGameStatText(s);
     
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -433,7 +452,8 @@ bool StudentWorld::triggerLandmine(Actor *a){
     for(list<Actor*>::iterator p = l.begin();p!=l.end();p++){
         current = *p;
         if(current->blockMove()&&current->canBeDamaged()){
-            return true;
+            if(overlap(current, a))
+                return true;
         }
     }
     return false;

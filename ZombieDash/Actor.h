@@ -80,6 +80,7 @@ public:
     GoodPeople(int imageID, double xc, double yc, StudentWorld* w);
     bool canBeInfected();
     void infect();
+    int getInfectionCount();
     bool infectToDeath();
     bool cure();
 private:
@@ -87,7 +88,6 @@ private:
     int infectionCount;
     bool isInfected();
     bool getWorse();
-    int getInfectionCount();
 };
 
 class Goodie : public CanBeDamaged{
@@ -103,6 +103,7 @@ public:
     void setRandomDirection();
     
     bool vomit();
+    void damage();
     
     bool isParalyzed(){return paralyzed;}
     void changeParalyzeStatus(){paralyzed = !paralyzed;}

@@ -279,6 +279,12 @@ bool BadPeople::vomit(){
     return false;
 }
 
+void BadPeople::damage(){
+    hell()->playSound(SOUND_ZOMBIE_DIE);
+    hell()->increaseScore(2000);
+    setDead();
+}
+
 /*
 bool BadPeople::decMovementPlan(){
     if(movementPlan<=0)
@@ -416,6 +422,7 @@ bool Penelope::useLandmine(){
 bool Penelope::useFlame(int n){
     if(n>getNumFlames())
         return false;
+    hell()->playSound(SOUND_PLAYER_FIRE);
     int direction = getDirection();
     double x = getX();
     double y = getY();
@@ -530,7 +537,7 @@ int Citizen::doSomething(){
             case 1:
             case 2:
             case 3:
-                z = new VaccineGoodie(getX(), getY(), hell());
+                z = new SmartZombie(getX(), getY(), hell());
                 break;
             default:
                 z = new DumbZombie(getX(), getY(), hell());
@@ -629,8 +636,10 @@ int Citizen::doSomething(){
 }
 
 void Citizen::damage(){
+    hell()->playSound(SOUND_CITIZEN_DIE);
     setDead();
     hell()->decreaseCitizen();
+    hell()->increaseScore(-1000);
 }
 
 //-----------------------------------------------------------------------------------------
@@ -721,6 +730,8 @@ void Landmine::damage(){
 }
 
 void Landmine::trigger(){
+    if(!isAlive())
+        return;
     setDead();
     hell()->playSound(SOUND_LANDMINE_EXPLODE);
     double x = getX();
