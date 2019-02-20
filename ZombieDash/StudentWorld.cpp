@@ -82,10 +82,8 @@ int StudentWorld::init()
                     case Level::citizen:
                         l.push_back(new Citizen(SPRITE_WIDTH*i, SPRITE_HEIGHT*j, this));
                         numOfCitizens++;
-                        cout<<"citizen created"<<endl;
                         break;
                     default:
-                        //cerr << "I'll handle you later";
                         break;
                 }
             }
@@ -186,6 +184,19 @@ bool StudentWorld::canMoveTo(double dest_x, double dest_y, Actor* self){
     return true;
 }
 
+bool StudentWorld::canFireTo(double dest_x, double dest_y){
+    if(dest_x>=VIEW_WIDTH||dest_x<0||dest_y>=VIEW_HEIGHT||dest_y<0)
+        return false;
+    Actor* current;
+    for(list<Actor*>::iterator p = l.begin();p!=l.end();p++){
+        current = *p;
+        if(!current->blockFlame())
+            continue;
+        if(abs(dest_x-current->getX())<SPRITE_WIDTH&&abs(dest_y-current->getY())<SPRITE_HEIGHT)
+            return false;
+    }
+    return true;
+}
 
 list<Actor*>::iterator StudentWorld::remove(list<Actor*>::iterator pp){
     if(pp==l.end())
@@ -279,7 +290,7 @@ void StudentWorld::burn(Actor* a){
 }
 
 void StudentWorld::poison(Actor* a){
-    if(overlap(penelope,a))
+    if(penelopeStepOn(a))
         penelope->infect();
     Actor* current;
     for(list<Actor*>::iterator p = l.begin();p!=l.end();p++){
@@ -415,6 +426,19 @@ void StudentWorld::penelopeCoord(double& targetX, double& targetY){
     targetY = penelope->getY();
 }
 
+bool StudentWorld::triggerLandmine(Actor *a){
+    if(penelopeStepOn(a))
+        return true;
+    Actor* current;
+    for(list<Actor*>::iterator p = l.begin();p!=l.end();p++){
+        current = *p;
+        if(current->blockMove()&&current->canBeDamaged()){
+            return true;
+        }
+    }
+    return false;
+}
+
 void StudentWorld::pGetVaccine(){
     penelope->incVaccines();
 }
@@ -425,4 +449,12 @@ void StudentWorld::pGetFlame(){
 
 void StudentWorld::pGetLandmine(){
     penelope->incLandmines();
+}
+
+bool StudentWorld::decreaseCitizen(){
+    if(numOfCitizens>0){
+        numOfCitizens--;
+        return true;
+    }
+    return false;
 }

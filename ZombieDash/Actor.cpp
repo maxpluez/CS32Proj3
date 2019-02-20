@@ -203,6 +203,14 @@ bool GoodPeople::infectToDeath(){
     return false;
 }
 
+bool GoodPeople::cure(){
+    if(infected){
+        infected = false;
+        return true;
+    }
+    return false;
+}
+
 Goodie::Goodie(int imageID, double xc, double yc, StudentWorld* w)
 : CanBeDamaged(imageID, xc, yc, 0, 1, w){}
 
@@ -397,22 +405,38 @@ void Penelope::incVaccines(){
 
 bool Penelope::useLandmine(){
     if(numLandmines>0){
+        Actor* l = new Landmine(getX(), getY(), hell());
+        hell()->addActor(l);
         numLandmines--;
         return true;
     }
     return false;
 }
 
-bool Penelope::useFlame(){
-    if(numFlames>0){
+bool Penelope::useFlame(int n){
+    if(n>getNumFlames())
+        return false;
+    int direction = getDirection();
+    double x = getX();
+    double y = getY();
+    for(int i=0;i<n;i++){
+        if(direction==up||direction==down){
+            newCoord(x, y, direction, SPRITE_HEIGHT);
+        } else {
+            newCoord(x, y, direction, SPRITE_WIDTH);
+        }
+        if(!hell()->canFireTo(x, y))
+            return false;
+        Actor* f = new Flame(x,y,direction,hell());
+        hell()->addActor(f);
         numFlames--;
-        return true;
     }
-    return false;
+    return true;
 }
 
 bool Penelope::useVaccine(){
     if(numVaccines>0){
+        cure();
         numVaccines--;
         return true;
     }
@@ -471,12 +495,22 @@ int Penelope::doSomething(){
             if(hell()->canMoveTo(dest_x, dest_y, this))
                 moveTo(dest_x, dest_y);
             break;
+        case KEY_PRESS_SPACE:
+            if(getNumFlames()<=0)
+                break;
+            else if(getNumFlames()>=3)
+                useFlame(3);
+            else
+                useFlame(getNumFlames());
+            break;
+        case KEY_PRESS_TAB:
+            useLandmine();
+            break;
+        case KEY_PRESS_ENTER:
+            useVaccine();
+            break;
     }
     return GWSTATUS_CONTINUE_GAME;
-}
-
-void Penelope::damage(){
-    setDead();
 }
 
 Citizen::Citizen(double xc, double yc, StudentWorld* w)
@@ -489,6 +523,7 @@ int Citizen::doSomething(){
         setDead();
         hell()->playSound(SOUND_ZOMBIE_BORN);
         hell()->increaseScore(-1000);
+        hell()->decreaseCitizen();
         int n = randInt(1,10);
         CanBeDamaged* z;
         switch(n){
@@ -593,6 +628,11 @@ int Citizen::doSomething(){
     return GWSTATUS_CONTINUE_GAME;
 }
 
+void Citizen::damage(){
+    setDead();
+    hell()->decreaseCitizen();
+}
+
 //-----------------------------------------------------------------------------------------
 
 DumbZombie::DumbZombie(double xc, double yc, StudentWorld* w)
@@ -655,4 +695,74 @@ int SmartZombie::doSomething(){
     zombieMove();
     changeParalyzeStatus();
     return GWSTATUS_CONTINUE_GAME;
+}
+
+//-------------------------------------------------------------------------------------------
+
+Landmine::Landmine(double xc, double yc, StudentWorld* w)
+: CanBeDamaged(IID_LANDMINE, xc, yc, 0, 1, w), safetyTick(30), isActive(false){}
+
+int Landmine::doSomething(){
+    if(!isAlive())
+        return GWSTATUS_CONTINUE_GAME;
+    if(!isActive){
+        safetyTick--;
+        if(safetyTick==0)
+            isActive = true;
+        return GWSTATUS_CONTINUE_GAME;
+    }
+    if(hell()->triggerLandmine(this))
+        trigger();
+    return GWSTATUS_CONTINUE_GAME;
+}
+
+void Landmine::damage(){
+    trigger();
+}
+
+void Landmine::trigger(){
+    setDead();
+    hell()->playSound(SOUND_LANDMINE_EXPLODE);
+    double x = getX();
+    double y = getY();
+    int direction = getDirection();
+    Actor* a;// = new Flame(selfX, selfY, direction, hell());
+    if(hell()->canFireTo(x, y)){
+        a = new Flame(x, y, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x+SPRITE_WIDTH, y)){
+        a = new Flame(x+SPRITE_WIDTH, y, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x-SPRITE_WIDTH, y)){
+        a = new Flame(x-SPRITE_WIDTH, y, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x, y+SPRITE_WIDTH)){
+        a = new Flame(x, y+SPRITE_WIDTH, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x, y-SPRITE_WIDTH)){
+        a = new Flame(x, y-SPRITE_WIDTH, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x+SPRITE_WIDTH, y+SPRITE_WIDTH)){
+        a = new Flame(x+SPRITE_WIDTH, y+SPRITE_WIDTH, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x-SPRITE_WIDTH, y+SPRITE_WIDTH)){
+        a = new Flame(x-SPRITE_WIDTH, y+SPRITE_WIDTH, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x+SPRITE_WIDTH, y-SPRITE_WIDTH)){
+        a = new Flame(x+SPRITE_WIDTH, y-SPRITE_WIDTH, direction, hell());
+        hell()->addActor(a);
+    }
+    if(hell()->canFireTo(x-SPRITE_WIDTH, y-SPRITE_WIDTH)){
+        a = new Flame(x-SPRITE_WIDTH, y-SPRITE_WIDTH, direction, hell());
+        hell()->addActor(a);
+    }
+    Actor* pit = new Pit(x, y, hell());
+    hell()->addActor(pit);
 }

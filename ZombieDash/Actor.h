@@ -55,6 +55,7 @@ class CanBeDamaged : public Actor{
 public:
     CanBeDamaged(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w);
     bool canBeDamaged();
+    void damage(){setDead();}
 };
 
 class Prop : public Actor{
@@ -80,6 +81,7 @@ public:
     bool canBeInfected();
     void infect();
     bool infectToDeath();
+    bool cure();
 private:
     bool infected;
     int infectionCount;
@@ -172,13 +174,12 @@ public:
     void incFlames();
     void incVaccines();
     bool useLandmine();
-    bool useFlame();
+    bool useFlame(int n);
     bool useVaccine();
     int getNumLandmines();
     int getNumFlames();
     int getNumVaccines();
     int doSomething();
-    void damage();
 private:
     int numLandmines;
     int numFlames;
@@ -189,6 +190,7 @@ class Citizen : public GoodPeople{
 public:
     Citizen(double xc, double yc, StudentWorld* w);
     int doSomething();
+    void damage();
     
     bool isParalyzed(){return paralyzed;}
     void changeParalyzeStatus(){paralyzed = !paralyzed;}
@@ -213,3 +215,16 @@ public:
 };
 
 #endif // ACTOR_H_
+
+//-------------------------------------------------------------------------------------------
+
+class Landmine : public CanBeDamaged{
+public:
+    Landmine(double xc, double yc, StudentWorld* w);
+    int doSomething();
+    void damage();
+private:
+    int safetyTick;
+    bool isActive;
+    void trigger();
+};

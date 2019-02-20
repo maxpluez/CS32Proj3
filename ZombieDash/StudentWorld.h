@@ -20,6 +20,7 @@ public:
     virtual int move();
     virtual void cleanUp();
     bool canMoveTo(double dest_x, double dest_y, Actor* self);
+    bool canFireTo(double dest_x, double dest_y);
     void addActor(Actor* a);
     double distance(double x1, double x2, double y1, double y2);
     
@@ -33,10 +34,13 @@ public:
     double distp(Actor* self);
     double distz(double x, double y);
     void penelopeCoord(double& targetX, double& targetY);
+    bool triggerLandmine(Actor* a);
     
     void pGetVaccine();
     void pGetFlame();
     void pGetLandmine();
+    
+    bool decreaseCitizen();
 private:
     list<Actor*> l;
     Penelope* penelope;
