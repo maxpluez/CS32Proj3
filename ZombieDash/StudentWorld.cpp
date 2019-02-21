@@ -15,8 +15,6 @@ GameWorld* createStudentWorld(string assetPath)
 	return new StudentWorld(assetPath);
 }
 
-// Students:  Add code to this file, StudentWorld.h, Actor.h and Actor.cpp
-
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath), numOfCitizens(0)
 {
@@ -258,9 +256,28 @@ double StudentWorld::distance(double x1, double x2, double y1, double y2){
     return ((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
 }
 
+bool StudentWorld::penelopeStepOn(Actor* a){
+    if(overlap(a,penelope)){
+        return true;
+    }
+    return false;
+}
+
+bool StudentWorld::decreaseCitizen(){
+    if(numOfCitizens>0){
+        numOfCitizens--;
+        return true;
+    }
+    return false;
+}
+
 //-----------------------------------------------------------------------------------------
 
 //Some actions related to doSomething() that can only be done here
+
+//-----------------------------------------------------------------------------------------
+
+//Exit
 
 int StudentWorld::exitDo(Exit* e){
     list<Actor*>::iterator pp = l.begin();
@@ -287,6 +304,10 @@ int StudentWorld::exitDo(Exit* e){
     return GWSTATUS_CONTINUE_GAME;
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Flame
+
 void StudentWorld::burn(Actor* a){
     if(overlap(penelope,a))
         penelope->damage();
@@ -308,6 +329,10 @@ void StudentWorld::burn(Actor* a){
     }
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Vomit
+
 void StudentWorld::poison(Actor* a){
     if(penelopeStepOn(a))
         penelope->infect();
@@ -321,12 +346,9 @@ void StudentWorld::poison(Actor* a){
     }
 }
 
-bool StudentWorld::penelopeStepOn(Actor* a){
-    if(overlap(a,penelope)){
-        return true;
-    }
-    return false;
-}
+//-----------------------------------------------------------------------------------------
+
+//BadPeople (Both Zombie)
 
 bool StudentWorld::personInFront(double vomitX, double vomitY){
     if(distance(penelope->getX(), vomitX, penelope->getY(), vomitY)<=100)
@@ -341,6 +363,10 @@ bool StudentWorld::personInFront(double vomitX, double vomitY){
     }
     return false;
 }
+
+//-----------------------------------------------------------------------------------------
+
+//Smart Zombie
 
 bool StudentWorld::smartScan(Actor *self, double& targetX, double& targetY){
     list<Actor*>::iterator min = l.begin();
@@ -401,6 +427,10 @@ bool StudentWorld::smartScan(Actor *self, double& targetX, double& targetY){
     return true;
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Citizen
+
 double StudentWorld::distp(Actor* self){
     return sqrt(distance(penelope->getX(), self->getX(), penelope->getY(), self->getY()));
 }
@@ -445,6 +475,10 @@ void StudentWorld::penelopeCoord(double& targetX, double& targetY){
     targetY = penelope->getY();
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Landmine
+
 bool StudentWorld::triggerLandmine(Actor *a){
     if(penelopeStepOn(a))
         return true;
@@ -459,6 +493,10 @@ bool StudentWorld::triggerLandmine(Actor *a){
     return false;
 }
 
+//-----------------------------------------------------------------------------------------
+
+//Penelope
+
 void StudentWorld::pGetVaccine(){
     penelope->incVaccines();
 }
@@ -469,12 +507,4 @@ void StudentWorld::pGetFlame(){
 
 void StudentWorld::pGetLandmine(){
     penelope->incLandmines();
-}
-
-bool StudentWorld::decreaseCitizen(){
-    if(numOfCitizens>0){
-        numOfCitizens--;
-        return true;
-    }
-    return false;
 }

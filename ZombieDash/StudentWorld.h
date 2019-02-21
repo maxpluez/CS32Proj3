@@ -16,35 +16,54 @@ class StudentWorld : public GameWorld
 {
 public:
     StudentWorld(std::string assetPath);
+    
+    //Three Must Implement Functions
     virtual int init();
     virtual int move();
     virtual void cleanUp();
+    
+    //Commonly Used Functions
     bool canMoveTo(double dest_x, double dest_y, Actor* self);
     bool canFireTo(double dest_x, double dest_y);
     void addActor(Actor* a);
     double distance(double x1, double x2, double y1, double y2);
-    
-    //list<Actor*>::iterator overlapCitizen(Actor* e);
-    int exitDo(Exit* e);
-    void burn(Actor* a);
-    void poison(Actor* a);
     bool penelopeStepOn(Actor* a);
+    bool decreaseCitizen();
+    
+    //Some actions related to doSomething() that can only be done here
+    
+    //Exit
+    int exitDo(Exit* e);
+    
+    //Flame
+    void burn(Actor* a);
+    
+    //Vomit
+    void poison(Actor* a);
+    
+    //Zombie
     bool personInFront(double vomitX, double vomitY);
     bool smartScan(Actor* self, double& targetX, double& targetY);
+    
+    //Citizen
     double distp(Actor* self);
     double distz(double x, double y);
     void penelopeCoord(double& targetX, double& targetY);
+    
+    //Landmine
     bool triggerLandmine(Actor* a);
     
+    //Penelope
     void pGetVaccine();
     void pGetFlame();
     void pGetLandmine();
     
-    bool decreaseCitizen();
 private:
     list<Actor*> l;
     Penelope* penelope;
     int numOfCitizens;
+    
+    //private member functions
     list<Actor*>::iterator remove(list<Actor*>::iterator pp);
     bool overlap(Actor* a1, Actor* a2);
 };
