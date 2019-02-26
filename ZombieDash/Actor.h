@@ -13,6 +13,7 @@ class StudentWorld;
 class Actor : public GraphObject{
 public:
     Actor(int imageID, double xc, double yc, int ddir, int ddepth, StudentWorld* w);
+    virtual ~Actor(){}
     virtual int doSomething() = 0;
     virtual bool canBeDamaged();
     virtual bool canBeInfected();
