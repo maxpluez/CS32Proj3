@@ -1,4 +1,5 @@
 I. High Level Description of Public Member Functions
+
 (Note: Many bool functions (if not specified what it returns) behave similarly to void, except that they return true if successfully done and return false if anything prevent it from performing normally)
 
 //Class Actor:
@@ -264,6 +265,31 @@ Give Penelope props.
 
 
 End of StudentWorld!!!
+
+
+
+
+
+
+II.Things not working
+
+Everything is working.
+
+
+
+
+
+
+III.Decisions and Assumptions
+
+1. Double and int. The getX() and getY() functions return double, and SPRITE Height and Width uses int. It becomes quite confusing whether this program will be tested with doubles or not. I choose to implement everything with double because the game, intuitively, should be able to work with doubles. 
+
+2. Similarly, because of the problem of int and double, there are 2 ways of determining bounding box : <=x+SPRITE-1 or <x+SPRITE. I use the latter
+
+3. The Spec doesn't directly say whether vomit can overlap with walls or not. Because vomit are spitted onto GoodPeoples, logically speaking we would never encounter a case where vomit is spitted onto the wall, so I didn't check wall in vomit's code.
+
+4. I choose to implement Penelope separate to the list.
+
 
 
 
