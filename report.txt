@@ -128,8 +128,142 @@ Obvious
 3. Bool blockFlame(){return true;}
 Obvious
 
+//class Exit : Actor
+
+1. Bool blockFlame(){return true;}
+
+2. Int DoSomething
+Specified by Spec
+
+//Props
+
+//class Flame, Vomit, Pit : Props
+
+They only have a doSomething() specified by spec. Flame and Vomit have private til time to live.
 
 
+//class Vaccine/Landmine/GasCanGoodies : Goodies
+
+They only have their own doSomething()
+
+
+
+//class Penelope : GoodPeople
+
+Void incLandmines/Flames/Vaccines()
+Increases the number of props player has
+
+Bool useLandmine/Flame/Vaccine()
+Use a goodie (in her doSomething())
+
+Int getNumLandmines/Flames/Vaccines()
+Obvious
+
+Int doSomething()
+Specified by Spec
+
+
+//class Citizen : GoodPeople
+
+Void damage()
+Besides setting dead, it needs to play sound and dec score. So overridden.
+
+Void infect()
+Same reason
+
+Bool isParalyzed()
+Obvious
+
+Void changeParalyzedState()
+Obvious
+
+Int doSomething()
+
+
+//class DumbZomebie : BadPeople
+
+Void damage()
+It has 10% chance introducing a vaccine goodie. So overridden.
+
+Int doSomething()
+
+
+//class SmartZombie : BadPeople
+
+only has Int doSomething()
+
+
+//class Landmine : CanBeDamaged
+
+Void damage()
+It is triggered besides setting dead when meeting flames. So overridden.
+
+Int doSomething()
+
+
+End Of Actors!!!!
+StudentWorld!!!!!
+
+init(), move(), cleanup() as specified in spec
+
+//Some utilities
+
+Bool canMoveTo(destx,desty,*self)
+Return whether self can move to destx, desty.
+
+Bool canFIreTo(x,y)
+Return whether flames can be created at x,y
+
+Void addActor(*a)
+Add actor (pointer) *a into the list
+
+Double distance (x1,y1,x2,y2)
+Return the distance between the 2 coordinates
+
+Bool penelopeStepOn(*a)
+Return whether Penelope overlaps with *a
+
+Bool decreaseCitizen()
+Decrease a citizen when it's killed or saved.
+
+
+//functions that relate to the doSomething() of actors
+
+Int exitDo()
+Basically the doSomething() for exit. It is quite different from others' doSomething(), and it needs to go through the list of actors to find citizens. So I decide to implement it separately.
+
+Void burn(*a)
+(a is a flame). Damage everything canBeDamaged overlapped with a
+
+Void poison(*a)
+(a is a vomit). Infect everything canBeInfected overlapped with a
+
+Bool personInFront(vomitX, vomitY)
+For zombies, determine whether there's anything canBeInfected overlapping with (vomitX, vomitY) basically the position in front of the zombie
+
+Bool smartScan(&targetX, &targetY, *self)
+For smartZombies, scan for nearest citizen/Penelope. Return true/false deciding whether to approach or not (<=80 or not)
+
+Bool canCreateVaccine(*a)
+(a is a VaccineGoodie). If a dumb zombie dies and want to create a vaccine goodie, return whether a can be created (if there is nothing overlapped with a).
+
+Double distp(*self)
+Return self's distance from Penelope. For citizens to decide whether to approach or not
+
+Double distz(x,y)
+Return the distance between (x,y) and the closest zombie. For citizens to decide whether to flee or not.
+
+Void penelopeCoord(&x, &y)
+Set x and y to the coordinate of Penelope. For citizens to decide the direction of approaching.
+
+Bool triggerLandmine(*a)
+(a is a landmine). Return whether landmine should be triggered or not. (If anything overlaps with it or not).
+
+Void pGetVaccine/Flame/Landmine()
+Give Penelope props.
+
+
+End of StudentWorld!!!
 
 
 
