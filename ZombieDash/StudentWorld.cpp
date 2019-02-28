@@ -41,12 +41,10 @@ int StudentWorld::init()
     oss<<".txt";
     string levelFile = oss.str();
     Level::LoadResult result = lev.loadLevel(levelFile);
-    if (result == Level::load_fail_file_not_found){
-        cerr << "Cannot find data file" << endl;
+    if (result == Level::load_fail_file_not_found)
         return GWSTATUS_PLAYER_WON;
-    }
     else if (result == Level::load_fail_bad_format)
-        cerr << "Your level was improperly formatted" << endl;
+        return GWSTATUS_LEVEL_ERROR;
     else if (result == Level::load_success){
         for(int i=0;i<LEVEL_WIDTH;i++){
             for(int j=0;j<LEVEL_HEIGHT;j++){
@@ -131,15 +129,25 @@ int StudentWorld::move()
     oss<<"Score: ";
     if(score==0)
         oss<<"00000";
-    else if(score<100)
+    else if(score>0&&score<100)
         oss<<"0000";
-    else if(score<1000)
+    else if(score>=100&&score<1000)
         oss<<"000";
-    else if(score<10000)
+    else if(score>=1000&&score<10000)
         oss<<"00";
-    else if(score<100000)
+    else if(score>=10000&&score<100000)
         oss<<"0";
-    oss<<score;
+    else if(score>=100000)
+        oss<<"";
+    else if(score<0&&score>-100)
+        oss<<"-000";
+    else if(score<=-100&&score>-1000)
+        oss<<"-00";
+    else if(score<=-1000&&score>-10000)
+        oss<<"-0";
+    else if(score<=-10000)
+        oss<<"-";
+    oss<<abs(score);
     oss<<"  Level: ";
     oss<<getLevel();
     oss<<"  Lives: ";
