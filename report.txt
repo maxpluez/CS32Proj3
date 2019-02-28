@@ -1,5 +1,146 @@
+I. High Level Description of Public Member Functions
+(Note: Many bool functions (if not specified what it returns) behave similarly to void, except that they return true if successfully done and return false if anything prevent it from performing normally)
+
+//Class Actor:
+
+1. Virtual int doSomething = 0;
+This function is set as virtual because each Actor do different things during 1 tick. It is set to pure virtual because we don't know what a general actor should do. There's no standard performances, and we don't want any Actor objects be created.
+
+2. virtual bool canBeDamaged(){return false;}
+This function tells Student world whether an object can be influenced by flame. It is set to fault because later I derive a class of CanBeDamaged so everything inside returns true. Therefore this general function that describes everything outside of class CanBeDamaged should return false.
+
+3. Virtual bool canBeInfected(){return false;}
+Same as 2
+
+4. Virtual void damage(){}
+It is the function called when something is in fact overlapped with flames. It is virtual because difference objects response to flames differently. (Some set dead, some play sounds, some are triggered like landmine). It is not pure virtual because many directly derived class, such as exits and walls, should be non-virtual. If this is pure virtual here, then exits and walls should re-implement this method to prevent becoming virtual class.
+
+5. Virtual void infect(){}
+Same as 4
+
+6. Virtual bool blockMoves(){return false;}
+It tells student world whether this object blocks movement or not. It is virtual because some actors block move, some don't. It return false on default because most actors don't block move.
+
+7. Virtual bool blockFlames(){return false;}
+Same as 6
+
+8. Bool isAlive()
+It returns private bool data member "alive" always instantiated to true when constructed. It's not virtual because every Actor can should have one of this and should perform the same.
+
+9. Void setDead()
+Not virtual. Similar reasoning with 8
+
+10. StudentWorld* hell()
+Return the pointer to the gameWorld. Most actors need to interact with gameWorld, and every actor wants the same pointer to the same world. Therefore it is not virtual
+
+
+//First Level Derived Classes
+
+//Class CanBeDamaged
+
+1. Bool canBeDamaged(){return true};
+It is already virtual.
+
+2. Void damage(){setDead();}
+This is how most canBeDamaged actors respond to damage. Will later be overridden by landmines, Penelope, etc.
+
+//Class Prop
+
+This class doesn't have special member functions. I just feel like categorizing flame, vomit, and pit.
+
+
+//Second Level Derived Classes
+
+//class People : public CanBeDamaged (include moving things such as citizens, Penelope, and Zombies)
+
+1. Void newCoord(&x,&y,direction,amount)
+A utility function that helps determining new coordinates instead of writing switch statements repeatedly.
+
+2. Bool blockMove(){return true;}
+Override virtual function. All People block move.
+
+3. Int Approach(targetX, targetY, &anotherDirection)
+A utility function that helps determine the direction approaching a target coordinate. Putted here because both smart zombies and citizens need this. Quite convenient with this utility function
+
+
+//class Goodie : public CanBeDamaged
+
+This class is just for grouping goodies and separating goodies from peoples. No special member functions.
+
+
+//Third Level Derived Classes
+
+//class GoodPeople : People (include citizens and Penelope, basically canBeInfected actors)
+
+1. Bool canBeInfected(){return true;}
+Overriding virtual function
+
+2. Void infect()
+Overriding virtual function. Setting status to infected
+
+3. Int GetInfectionCount()
+As stated in its name (called to determine if it reaches 500)
+
+4. Bool isInfected()
+Return whether infected or not
+
+5. Bool infectToDeath()
+Called when infectionCount>=500. Handles things that happen after infection count get to 500 (when the actor is dead because of infection)
+
+6. Bool cure()
+Set infected to false
+
+
+//class BadPeople : People (include dumb and smart zombies)
+
+1. Bool zombieMove()
+A function that ONLY moves a zombie with its current direction. It doesn't determine anything
+
+2. Bool planMovement()
+Plan a new Zombie Movement when its current movement plan == 0
+
+3. Void setRandomDirection()
+A utility function that set a random direction for the zombie when planning movement. (I don't want to repeat writing the code generating random numbers and setting a direction for each number generated).
+
+4. Bool vomit()
+A function that perform vomit of each zombie, I.e. creating a vomit object if someone's in front of it.
+
+5. Bool isParalyzed()
+Return whether the zombie is paralyzed
+
+6. Void changeParalyzedStatus()
+As stated in its name
+
+7. Int getMovementPlan()
+Return the number of steps left in its current plan
+
+
+//Below are actual non-abstract actors
+
+//class Wall : Actor
+
+1. Int doSomething(){}
+Do nothing. Return continue. Have to implement to avoid being pure virtual
+
+2. Bool blockMove(){return true;}
+Obvious
+
+3. Bool blockFlame(){return true;}
+Obvious
+
+
+
+
+
+
+
+
+IV. Debugging
+
 Debug Goodies:
 	I put one of each types of the goodies into the map. When Penelope steps on it, I checked whether the number of goodies I have and the score increases (shown by the display string at the top of the screen).
+
+
 
 Debug Penelope:
 	First, (part 1 of this project) I test whether Penelope properly responds to my WASD inputs, and whether Penelope would move into a wall.
@@ -8,13 +149,19 @@ Debug Penelope:
 	2. For Vaccines: Besides normal case, I tested cases where there is no vaccines left (should't be cured), and where Penelope is not infected (numVaccines still decreases). NumVaccines should be properly decreased by one.
 	3. For Landmine: Here I ensure that Penelope can put down a landmine, decrease numLandmines by 1, and do nothing when there's no landmine left. Further testings are done in the last paragraph debugging landmine itself.
 
+
+
 Debug Dumb Zombie:
 	I put a dumb zombie and a flame goodie. The first step is to watch the zombie, see if it is moving in a similar way as the sample exe. When I was debugging, I found out that my zombie was moving longer than its movement plan (All the way across the map) and found a bug in doSomething().
 	Then, I test whether dumb zombie vomit on me by walking Penelope beside the zombie. I make sure the zombie only vomit when it is facing me. (It also tests whether vomits are properly created and destroyer. I found out a bug that I forgot to decrease the ttl of vomits through this step) Then I start micro-controlling Penelope up and down to see whether the probability of vomiting is about 1/3 or not and to see if the movement between the zombie and Penelope is blocked. Sometimes when I was micro-controlling the zombie does not vomit, which is what we desire. After that, I try firing at the zombie for many times until it drops a vaccine goodie. I tried for many times and make sure the probability is about 0.1.
 	Finally, I change the level map and put the zombie beside the wall to see if it will move into the wall and to see if its movement plan will change accordingly after bumping into a wall.
 
+
+
 Debug Smart Zombie:
 	The only difference between smart zombie and dumb zombie is its ability to track down citizen and Penelope. Therefore I tested smart zombie together with citizen to see if one will track/flee from each other. (See the next paragraph)
+
+
 
 Debug citizen:
 	I put a citizen and a smart zombie (far away from walls). I put smart zombie close enough to the citizen  to see if it will approach it. And then I test whether citizen will flee from the zombie. Finally I test if I approach the citizen, will it follow me.
@@ -22,13 +169,18 @@ Debug citizen:
 	Another step involves Penelope. After Penelope lead every citizens into the exit, will Penelope properly exit and finish the level. Also, Penelope shouldn't exit when there is still citizens in the level. Through this step I found out a bug that I forgot to decrease numOfCitizen after a citizen dies.
 	Finally I tested whether they will turn into zombies after infected to 500. The probability of turning into a smart zombie is 0.3. To make it visualized, I let the citizen turn into a vaccine goodie if the probability falls into 0.3, else turn into a dumb zombie. This helps visualize the process of turning into different kinds of zombies. Still, score should be properly decreased.
 
+
+
 Debug Landmine:
 	I put a landmine goodie, and a citizen. I put a landmine close to the citizen, run away, and let the citizen follow me into the landmine. Test cases are:
 	1. Making sure that landmine does not explode right after I put it down. It proves that the activation time of 30 ticks is working. (I found out a bug about the activation time here in this step)
 	2. When the citizen is lured into the landmine, I ensured that flames are properly created around the landmine (direction up) with a short til, and that a permanent pit will also be created. Also, score should be properly decreased.
 	3. I put the landmine against a wall and then against an exit to ensure that flames are not created in these blocked places.
 
+
+
 Debug Pit:
 	Each test cases I lure one type of "People" into the pit to see if they are properly destroyed (score also decreased). Also, I fired onto the pit to see that flames are not blocked.
+
 
 Other classes such as Vomit, Flames, Exits and Walls are tested along with the classes above (eg tested walls with Penelope in Part 1, exit with Penelope, vomit with zombies, flame with landmine and Penelope). See the debugging processes above
