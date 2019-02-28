@@ -126,14 +126,25 @@ int StudentWorld::move()
         p++;
     }
     
+    int score = getScore();
     ostringstream oss;
     oss<<"Score: ";
-    oss<<getScore();
+    if(score==0)
+        oss<<"00000";
+    else if(score<100)
+        oss<<"0000";
+    else if(score<1000)
+        oss<<"000";
+    else if(score<10000)
+        oss<<"00";
+    else if(score<100000)
+        oss<<"0";
+    oss<<score;
     oss<<"  Level: ";
     oss<<getLevel();
     oss<<"  Lives: ";
     oss<<getLives();
-    oss<<"  Vacc: ";
+    oss<<"  Vaccines: ";
     oss<<penelope->getNumVaccines();
     oss<<"  Flames: ";
     oss<<penelope->getNumFlames();
@@ -362,6 +373,23 @@ bool StudentWorld::personInFront(double vomitX, double vomitY){
             return true;
     }
     return false;
+}
+
+//-----------------------------------------------------------------------------------------
+
+//Dumb Zombie
+
+bool StudentWorld::canCreateVaccine(VaccineGoodie* v){
+    if(penelopeStepOn(v))
+        return false;
+    
+    Actor* current;
+    for(list<Actor*>::iterator p = l.begin();p!=l.end();p++){
+        current = *p;
+        if(overlap(current,v))
+            return false;
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------------------

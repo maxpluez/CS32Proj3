@@ -82,12 +82,12 @@ public:
     bool canBeInfected();
     void infect();
     int getInfectionCount();
+    bool isInfected();
     bool infectToDeath();
     bool cure();
 private:
     bool infected;
     int infectionCount;
-    bool isInfected();
     bool getWorse();
 };
 
@@ -176,7 +176,7 @@ public:
     void incFlames();
     void incVaccines();
     bool useLandmine();
-    bool useFlame(int n);
+    bool useFlame();
     bool useVaccine();
     int getNumLandmines();
     int getNumFlames();
@@ -193,6 +193,7 @@ public:
     Citizen(double xc, double yc, StudentWorld* w);
     int doSomething();
     void damage();
+    void infect();
     
     bool isParalyzed(){return paralyzed;}
     void changeParalyzeStatus(){paralyzed = !paralyzed;}
@@ -208,6 +209,7 @@ class DumbZombie : public BadPeople{
 public:
     DumbZombie(double xc, double yc, StudentWorld* w);
     int doSomething();
+    void damage();
 };
 
 class SmartZombie : public BadPeople{

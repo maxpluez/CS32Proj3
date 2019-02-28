@@ -9,6 +9,7 @@ using namespace std;
 class Actor;
 class Exit;
 class Penelope;
+class VaccineGoodie;
 
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 
@@ -22,7 +23,7 @@ public:
     virtual int move();
     virtual void cleanUp();
     
-    //Commonly Used Functions
+    //Commonly Used utility Functions
     bool canMoveTo(double dest_x, double dest_y, Actor* self);
     bool canFireTo(double dest_x, double dest_y);
     void addActor(Actor* a);
@@ -44,6 +45,7 @@ public:
     //Zombie
     bool personInFront(double vomitX, double vomitY);
     bool smartScan(Actor* self, double& targetX, double& targetY);
+    bool canCreateVaccine(VaccineGoodie* v);
     
     //Citizen
     double distp(Actor* self);
@@ -64,7 +66,7 @@ private:
     int numOfCitizens;
     
     //private member functions
-    list<Actor*>::iterator remove(list<Actor*>::iterator pp);
+    list<Actor*>::iterator remove(list<Actor*>::iterator pp); //delete memory + remove from list
     bool overlap(Actor* a1, Actor* a2);
 };
 
