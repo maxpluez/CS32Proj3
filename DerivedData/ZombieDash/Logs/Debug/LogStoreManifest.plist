@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>9</integer>
+	<key>logs</key>
+	<dict>
+		<key>479EE514-17DB-4C66-9F08-A9A1929D3508</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>479EE514-17DB-4C66-9F08-A9A1929D3508.xcactivitylog</string>
+			<key>highLevelStatus</key>
+			<string>S</string>
+			<key>schemeIdentifier-containerName</key>
+			<string>ZombieDash project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ZombieDash</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Debug ZombieDash</string>
+			<key>timeStartedRecording</key>
+			<real>573029344.318362</real>
+			<key>timeStoppedRecording</key>
+			<real>573029358.45159495</real>
+			<key>title</key>
+			<string>Debug ZombieDash</string>
+			<key>uniqueIdentifier</key>
+			<string>479EE514-17DB-4C66-9F08-A9A1929D3508</string>
+		</dict>
+		<key>47C730C3-8194-45FF-A86D-A34AD3F12D42</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>47C730C3-8194-45FF-A86D-A34AD3F12D42.xcactivitylog</string>
+			<key>highLevelStatus</key>
+			<string>S</string>
+			<key>schemeIdentifier-containerName</key>
+			<string>ZombieDash project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ZombieDash</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Debug ZombieDash</string>
+			<key>timeStartedRecording</key>
+			<real>573028295.20402002</real>
+			<key>timeStoppedRecording</key>
+			<real>573028364.04084098</real>
+			<key>title</key>
+			<string>Debug ZombieDash</string>
+			<key>uniqueIdentifier</key>
+			<string>47C730C3-8194-45FF-A86D-A34AD3F12D42</string>
+		</dict>
+		<key>5B02D330-FC74-44B9-8A3C-DCF70912ABA5</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>5B02D330-FC74-44B9-8A3C-DCF70912ABA5.xcactivitylog</string>
+			<key>highLevelStatus</key>
+			<string>S</string>
+			<key>schemeIdentifier-containerName</key>
+			<string>ZombieDash project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ZombieDash</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Debug ZombieDash</string>
+			<key>timeStartedRecording</key>
+			<real>573029331.21376204</real>
+			<key>timeStoppedRecording</key>
+			<real>573029342.55053496</real>
+			<key>title</key>
+			<string>Debug ZombieDash</string>
+			<key>uniqueIdentifier</key>
+			<string>5B02D330-FC74-44B9-8A3C-DCF70912ABA5</string>
+		</dict>
+		<key>745E2CD1-3066-4F8A-BC29-FB0DAD982BBB</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>745E2CD1-3066-4F8A-BC29-FB0DAD982BBB.xcactivitylog</string>
+			<key>highLevelStatus</key>
+			<string>S</string>
+			<key>schemeIdentifier-containerName</key>
+			<string>ZombieDash project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ZombieDash</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Debug ZombieDash</string>
+			<key>timeStartedRecording</key>
+			<real>573027457.98398602</real>
+			<key>timeStoppedRecording</key>
+			<real>573027650.744977</real>
+			<key>title</key>
+			<string>Debug ZombieDash</string>
+			<key>uniqueIdentifier</key>
+			<string>745E2CD1-3066-4F8A-BC29-FB0DAD982BBB</string>
+		</dict>
+		<key>AD732880-03B2-4D8E-AA8E-374BE3D2A668</key>
+		<dict>
+			<key>className</key>
+			<string>DBGConsoleLog</string>
+			<key>documentTypeString</key>
+			<string>com.apple.dt.IDE.DebuggerLogContentType</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
+			<key>fileName</key>
+			<string>AD732880-03B2-4D8E-AA8E-374BE3D2A668.xcactivitylog</string>
+			<key>highLevelStatus</key>
+			<string>S</string>
+			<key>schemeIdentifier-containerName</key>
+			<string>ZombieDash project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ZombieDash</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Debug ZombieDash</string>
+			<key>timeStartedRecording</key>
+			<real>573029221.03816199</real>
+			<key>timeStoppedRecording</key>
+			<real>573029319.65300095</real>
+			<key>title</key>
+			<string>Debug ZombieDash</string>
+			<key>uniqueIdentifier</key>
+			<string>AD732880-03B2-4D8E-AA8E-374BE3D2A668</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

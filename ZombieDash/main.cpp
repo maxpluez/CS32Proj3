@@ -33,7 +33,7 @@ GameWorld* createStudentWorld(string assetPath = "");
 int main(int argc, char* argv[])
 {
     //string assetPath = assetDirectory;
-    string assetPath = "/Users/Max/Documents/Programming/CS32/Project3/ZombieDash/DerivedData/ZombieDash/Build/Products/Debug/Assets";
+    string assetPath = assetDirectory;
     if (!assetPath.empty())
     {
         if (!is_directory(assetPath))

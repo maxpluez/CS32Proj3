@@ -678,6 +678,7 @@ int DumbZombie::doSomething(){
 
 void DumbZombie::damage(){
     BadPeople::damage();
+    hell()->increaseScore(-1000);
     int i = randInt(1,10);
     if(i==1){
         int direction = getDirection();
