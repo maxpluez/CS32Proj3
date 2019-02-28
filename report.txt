@@ -1,0 +1,34 @@
+Debug Goodies:
+	I put one of each types of the goodies into the map. When Penelope steps on it, I checked whether the number of goodies I have and the score increases (shown by the display string at the top of the screen).
+
+Debug Penelope:
+	First, (part 1 of this project) I test whether Penelope properly responds to my WASD inputs, and whether Penelope would move into a wall.
+	Second, I put several goodies into the map, collect them, and see if space, tab, and enter are responded properly.
+	1. For Flames: Besides normal case, I tested the cases where there is no numFlames left (sound shouldn't be played), when Penelope is facing an exit, facing a wall (sound should be played), one/two blocks away from exit or wall (to see if the proper number of flames are created). I fire into zombies, citizens, landmines and goodies to see if they are destroyed (or triggered), and scores are properly increased. NumFlames should always decrease by 1.
+	2. For Vaccines: Besides normal case, I tested cases where there is no vaccines left (should't be cured), and where Penelope is not infected (numVaccines still decreases). NumVaccines should be properly decreased by one.
+	3. For Landmine: Here I ensure that Penelope can put down a landmine, decrease numLandmines by 1, and do nothing when there's no landmine left. Further testings are done in the last paragraph debugging landmine itself.
+
+Debug Dumb Zombie:
+	I put a dumb zombie and a flame goodie. The first step is to watch the zombie, see if it is moving in a similar way as the sample exe. When I was debugging, I found out that my zombie was moving longer than its movement plan (All the way across the map) and found a bug in doSomething().
+	Then, I test whether dumb zombie vomit on me by walking Penelope beside the zombie. I make sure the zombie only vomit when it is facing me. (It also tests whether vomits are properly created and destroyer. I found out a bug that I forgot to decrease the ttl of vomits through this step) Then I start micro-controlling Penelope up and down to see whether the probability of vomiting is about 1/3 or not and to see if the movement between the zombie and Penelope is blocked. Sometimes when I was micro-controlling the zombie does not vomit, which is what we desire. After that, I try firing at the zombie for many times until it drops a vaccine goodie. I tried for many times and make sure the probability is about 0.1.
+	Finally, I change the level map and put the zombie beside the wall to see if it will move into the wall and to see if its movement plan will change accordingly after bumping into a wall.
+
+Debug Smart Zombie:
+	The only difference between smart zombie and dumb zombie is its ability to track down citizen and Penelope. Therefore I tested smart zombie together with citizen to see if one will track/flee from each other. (See the next paragraph)
+
+Debug citizen:
+	I put a citizen and a smart zombie (far away from walls). I put smart zombie close enough to the citizen  to see if it will approach it. And then I test whether citizen will flee from the zombie. Finally I test if I approach the citizen, will it follow me.
+	Smart Zombie is together with citizen. Not only should it follow citizens, it should also follow me. I approach the smart zombie from the other side to see if it will follow me.
+	Another step involves Penelope. After Penelope lead every citizens into the exit, will Penelope properly exit and finish the level. Also, Penelope shouldn't exit when there is still citizens in the level. Through this step I found out a bug that I forgot to decrease numOfCitizen after a citizen dies.
+	Finally I tested whether they will turn into zombies after infected to 500. The probability of turning into a smart zombie is 0.3. To make it visualized, I let the citizen turn into a vaccine goodie if the probability falls into 0.3, else turn into a dumb zombie. This helps visualize the process of turning into different kinds of zombies. Still, score should be properly decreased.
+
+Debug Landmine:
+	I put a landmine goodie, and a citizen. I put a landmine close to the citizen, run away, and let the citizen follow me into the landmine. Test cases are:
+	1. Making sure that landmine does not explode right after I put it down. It proves that the activation time of 30 ticks is working. (I found out a bug about the activation time here in this step)
+	2. When the citizen is lured into the landmine, I ensured that flames are properly created around the landmine (direction up) with a short til, and that a permanent pit will also be created. Also, score should be properly decreased.
+	3. I put the landmine against a wall and then against an exit to ensure that flames are not created in these blocked places.
+
+Debug Pit:
+	Each test cases I lure one type of "People" into the pit to see if they are properly destroyed (score also decreased). Also, I fired onto the pit to see that flames are not blocked.
+
+Other classes such as Vomit, Flames, Exits and Walls are tested along with the classes above (eg tested walls with Penelope in Part 1, exit with Penelope, vomit with zombies, flame with landmine and Penelope). See the debugging processes above
